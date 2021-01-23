@@ -136,7 +136,6 @@ window.addEventListener('scroll', showModalByScroll);
 function showModalByScroll() {
   if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
     openModal();
-    window.removeEventListener('scroll', showModalByScroll);
   }
 }
 
@@ -145,6 +144,7 @@ function openModal() {
   modalWindow.classList.add('fade');
   document.body.style.overflow = 'hidden';
   clearInterval(showModalTimer);
+  window.removeEventListener('scroll', showModalByScroll);
 }
 
 function closeModal(modal) {
