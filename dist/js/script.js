@@ -99,8 +99,59 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _tabs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_tabs__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _timer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./timer */ "./src/js/timer.js");
 /* harmony import */ var _timer__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_timer__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _modal__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./modal */ "./src/js/modal.js");
+/* harmony import */ var _modal__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_modal__WEBPACK_IMPORTED_MODULE_2__);
 
 
+
+
+/***/ }),
+
+/***/ "./src/js/modal.js":
+/*!*************************!*\
+  !*** ./src/js/modal.js ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+const modalBtns = document.querySelectorAll('[data-modal]'),
+      modalWindow = document.querySelector('.modal'),
+      modalCloseBtn = modalWindow.querySelector('[data-close]');
+let showModalTimer = setTimeout(openModal, 15000);
+modalBtns.forEach(btn => {
+  btn.addEventListener('click', openModal);
+});
+modalWindow.addEventListener('click', e => {
+  if (e.target == modalWindow || e.target == modalCloseBtn) {
+    closeModal(modalWindow);
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.code == 'Escape' && modalWindow.style.display != '') {
+    closeModal(modalWindow);
+  }
+});
+window.addEventListener('scroll', showModalByScroll);
+
+function showModalByScroll() {
+  if (window.pageYOffset + document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+    openModal();
+    window.removeEventListener('scroll', showModalByScroll);
+  }
+}
+
+function openModal() {
+  modalWindow.style.display = 'block';
+  modalWindow.classList.add('fade');
+  document.body.style.overflow = 'hidden';
+  clearInterval(showModalTimer);
+}
+
+function closeModal(modal) {
+  modal.style.display = '';
+  modal.classList.remove('fade');
+  document.body.style.overflow = 'auto';
+}
 
 /***/ }),
 
