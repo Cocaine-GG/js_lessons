@@ -2,7 +2,7 @@ const modalBtns = document.querySelectorAll('[data-modal]'),
 			modalWindow = document.querySelector('.modal'),
 			modalCloseBtn = modalWindow.querySelector('[data-close]')
 
-let showModalTimer = setTimeout(openModal, 15000)
+let showModalTimer = setTimeout(openModal, 60000)
 
 modalBtns.forEach(btn => {
 	btn.addEventListener('click', openModal)
