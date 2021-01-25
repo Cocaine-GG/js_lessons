@@ -42,8 +42,7 @@ function closeModal() {
 
 //Form JS
 
-const forms = document.querySelectorAll('form'),
-	URL = 'server.php'
+const forms = document.querySelectorAll('form')
 const message = {
 	loading : 'Загрузка...',
 	success : 'Спасибо! Скоро мы с вами свяжемся',
@@ -55,8 +54,8 @@ forms.forEach(form=>{
 })
 
 
-function postData (form){
-	form.addEventListener('submit', (e)=>{
+function postData(form) {
+	form.addEventListener('submit', (e) => {
 		e.preventDefault()
 
 		const statusMessage = document.createElement('div')
@@ -64,29 +63,26 @@ function postData (form){
 		statusMessage.textContent = message.loading
 		form.insertAdjacentElement('afterend', statusMessage)
 
-		const request = new XMLHttpRequest()
+		const formData = new FormData(form),
+					obj = {}
 
-		request.open('POST',URL)
-		request.setRequestHeader('Content-type', 'application/json; charset=utf-8')
+		formData.forEach((value, key) => obj[key] = value)
 
-		const formData = new FormData(form), obj = {}
-		formData.forEach((value, key)=>{
-			obj[key] = value
-		})
-		const json = JSON.stringify(obj)
-
-		request.send(json)
-		request.addEventListener('load',()=>{
-			if (request.status === 200){
-				console.log(request.response)
-				showThankModal(message.success)
-				form.reset()
-				statusMessage.remove()
-			}else {
-				console.log(message.failure)
-				showThankModal(message.failure)
+		fetch('server.php', {
+			method: 'POST',
+			body: JSON.stringify(obj),
+			headers: {
+				'Content-type': 'application/json'
 			}
-		})
+		}).then(data=>data.json())
+		 	.then(data => {
+			console.log(data)
+			showThankModal(message.success)
+			statusMessage.remove()
+		}).catch(() => {
+			console.log(message.failure)
+			showThankModal(message.failure)
+		}).finally(() => form.reset())
 	})
 }
 
