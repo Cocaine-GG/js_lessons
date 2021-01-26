@@ -199,9 +199,9 @@ __webpack_require__.r(__webpack_exports__);
 /***/ (function(module, exports) {
 
 class MenuCard {
-  constructor(imgSrc, alt, title, desc, price, parentSelector, ...classes) {
-    this.imgSrc = imgSrc;
-    this.alt = alt;
+  constructor(img, altimg, title, desc, price, parentSelector, ...classes) {
+    this.imgSrc = img;
+    this.alt = altimg;
     this.title = title;
     this.desc = desc;
     this.price = price;
@@ -240,9 +240,48 @@ class MenuCard {
 
 }
 
-new MenuCard('img/tabs/vegy.jpg', 'vegy', 'Меню "Фитнес"', 'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!', 8.5, '.menu__field .container', 'menu__item').render();
-new MenuCard('img/tabs/elite.jpg', 'elite', 'Меню "Премиум"', 'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!', 20.4, '.menu__field .container', 'menu__item').render();
-new MenuCard('img/tabs/post.jpg', 'post', 'Меню "Постное"', 'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.', 15.95, '.menu__field .container', 'menu__item').render();
+const getResource = async url => {
+  const res = await fetch(url);
+
+  if (!res.ok) {
+    new Error(`Could not fetch ${url}, status ${res.status} `);
+  }
+
+  return await res.json();
+};
+
+getResource('http://localhost:3000/menu').then(data => {
+  data.forEach(({
+    img,
+    altimg,
+    title,
+    desc,
+    price
+  }) => {
+    new MenuCard(img, altimg, title, desc, price, '.menu__field .container').render();
+  });
+}); // Еще один вариант
+// getResource('http://localhost:3000/menu')
+// 	.then(data=>createCard(data))
+//
+// function createCard(data) {
+// 	data.forEach(({img, altimg, title, desc, price}) => {
+// 		const parent = document.querySelector('.menu__field .container'),
+// 					element = document.createElement('div')
+//
+// 		element.classList.add('menu__item')
+// 		element.innerHTML = `
+// 											<img src=${img} alt=${altimg}>
+// 											<h3 class="menu__item-subtitle">${title}</h3>
+// 											<div class="menu__item-descr">${desc}</div>
+// 											<div class="menu__item-divider"></div>
+// 											<div class="menu__item-price">
+// 													<div class="menu__item-cost">Цена:</div>
+// 													<div class="menu__item-total"><span>${price * 27}</span> грн/день</div>
+// 											</div>`
+// 		parent.insertAdjacentElement('beforeend', element)
+// 	})
+// }
 
 /***/ }),
 
@@ -299,10 +338,21 @@ const message = {
   failure: 'Что-то пошло не так...'
 };
 forms.forEach(form => {
-  postData(form);
+  bindPostData(form);
 });
 
-function postData(form) {
+const postData = async (url, data) => {
+  let res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-type': 'application/json'
+    },
+    body: data
+  });
+  return await res.json();
+};
+
+function bindPostData(form) {
   form.addEventListener('submit', e => {
     e.preventDefault();
     const statusMessage = document.createElement('div');
@@ -310,15 +360,8 @@ function postData(form) {
     statusMessage.textContent = message.loading;
     form.insertAdjacentElement('afterend', statusMessage);
     const formData = new FormData(form),
-          obj = {};
-    formData.forEach((value, key) => obj[key] = value);
-    fetch('server.php', {
-      method: 'POST',
-      body: JSON.stringify(obj),
-      headers: {
-        'Content-type': 'application/json'
-      }
-    }).then(data => data.json()).then(data => {
+          json = JSON.stringify(Object.fromEntries(formData.entries()));
+    postData('http://localhost:3000/requests', json).then(data => {
       console.log(data);
       showThankModal(message.success);
       statusMessage.remove();

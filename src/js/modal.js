@@ -50,11 +50,22 @@ const message = {
 }
 
 forms.forEach(form=>{
-	postData(form)
+	bindPostData(form)
 })
 
+const postData = async (url,data) =>{
+	let res = await fetch(url,{
+		method: 'POST',
+		headers: {
+			'Content-type': 'application/json'
+		},
+		body: data,
+	})
 
-function postData(form) {
+	return  await res.json()
+}
+
+function bindPostData(form) {
 	form.addEventListener('submit', (e) => {
 		e.preventDefault()
 
@@ -64,25 +75,19 @@ function postData(form) {
 		form.insertAdjacentElement('afterend', statusMessage)
 
 		const formData = new FormData(form),
-					obj = {}
+					json = JSON.stringify(Object.fromEntries(formData.entries()))
 
-		formData.forEach((value, key) => obj[key] = value)
-
-		fetch('server.php', {
-			method: 'POST',
-			body: JSON.stringify(obj),
-			headers: {
-				'Content-type': 'application/json'
-			}
-		}).then(data=>data.json())
-		 	.then(data => {
-			console.log(data)
-			showThankModal(message.success)
-			statusMessage.remove()
-		}).catch(() => {
-			console.log(message.failure)
-			showThankModal(message.failure)
-		}).finally(() => form.reset())
+		postData('http://localhost:3000/requests',json)
+			.then(data => {
+				console.log(data)
+				showThankModal(message.success)
+				statusMessage.remove()
+			})
+			.catch(() => {
+				console.log(message.failure)
+				showThankModal(message.failure)
+			})
+			.finally(() => form.reset())
 	})
 }
 
