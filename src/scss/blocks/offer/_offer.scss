@@ -76,6 +76,10 @@
             font-weight: bold;
             color: rgba(0,0,0,1);
         }
+        &-prev > img,
+        &-next > img {
+            pointer-events: none;
+        }
     }
     &__slide {
         width: 100%;

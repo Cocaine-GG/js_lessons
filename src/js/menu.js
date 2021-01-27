@@ -76,3 +76,14 @@ getResource('http://localhost:3000/menu')
 // 		parent.insertAdjacentElement('beforeend', element)
 // 	})
 // }
+
+//Вариант с axios
+
+// axios.get('http://localhost:3000/menu')
+// 	.then((res) => res.data)
+// 	.then(data=> {
+// 		data.forEach(({img, altimg, title, desc, price}) => {
+// 			new MenuCard(img, altimg, title, desc, price, '.menu__field .container').render()
+// 		})
+// })
+// 	.catch(err => console.log(err))
