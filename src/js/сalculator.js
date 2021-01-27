@@ -1,6 +1,31 @@
 const result = document.querySelector('.calculating__result span')
-let sex = 'female', weight, height, age, ratio = 1.375
+let sex, weight, height, age, ratio
 
+//set sex
+localStorage.getItem('sex')
+	? sex = localStorage.getItem('sex')
+	: sex = 'female'
+		localStorage.setItem('sex', sex)
+//set ratio
+localStorage.getItem('ratio')
+	? ratio = localStorage.getItem('ratio')
+	: ratio = 1.375
+		localStorage.setItem('ratio', ratio)
+
+function initLocalSettings(selector, activeClass) {
+	const elements = document.querySelectorAll(selector)
+
+	elements.forEach(element=>{
+		element.classList.remove(activeClass)
+		if (element.getAttribute('id') === localStorage.getItem('sex')){
+			element.classList.add(activeClass)
+		}
+		if (element.getAttribute('data-ratio') === localStorage.getItem('ratio')){
+			element.classList.add(activeClass)
+		}
+	})
+}
+initLocalSettings('.calculating__choose-item','calculating__choose-item_active')
 function calcTotal () {
 	if(!sex || !weight || !height || !age || !ratio){
 		result.textContent = '____'
@@ -16,11 +41,13 @@ function getStaticInfo(parentSelector, activeClass){
 	const elements = document.querySelectorAll(`${parentSelector} div`)
 	elements.forEach(element=>{
 		element.addEventListener('click',e=>{
-			e.target.getAttribute('data-ratio')
-				? ratio = +e.target.getAttribute('data-ratio')
-				: sex = e.target.getAttribute('id')
-
-			console.log(ratio,sex)
+			if(e.target.getAttribute('data-ratio')){
+				ratio = +e.target.getAttribute('data-ratio')
+				localStorage.setItem('ratio', e.target.getAttribute('data-ratio'))
+			}else{
+				sex = e.target.getAttribute('id')
+				localStorage.setItem('sex', e.target.getAttribute('id'))
+			}
 			elements.forEach(el=>el.classList.remove(activeClass))
 			e.target.classList.add(activeClass)
 			calcTotal()
@@ -31,6 +58,11 @@ function getStaticInfo(parentSelector, activeClass){
 function getDynamicInfo(selector) {
 	const input = document.querySelector(selector)
 	input.addEventListener('input', e => {
+		if (input.value.match(/\D/g)){
+			input.style.border = '1px solid red'
+		}else {
+			input.style.border = 'none'
+		}
 		switch (input.getAttribute('id')) {
 			case 'height':
 				height = +input.value
@@ -42,7 +74,6 @@ function getDynamicInfo(selector) {
 				age = +input.value
 				break
 		}
-		console.log(height, weight, age)
 		calcTotal()
 	})
 }
